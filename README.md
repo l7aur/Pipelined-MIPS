@@ -33,5 +33,8 @@ _Note 2: For the processor to work in a full 16-bit mode the roles of the switch
 
 ![Screenshot 2024-04-21 112104](https://github.com/l7aur/Single-Cycle-MIPS/assets/81981519/660ba878-d82e-4da9-af25-46823d64db49)
 
+![image](https://github.com/l7aur/Pipelined-MIPS-Processor/assets/81981519/b388e12d-ea8a-4c38-add1-f2ed1f87b36d)
+
+
 
 
