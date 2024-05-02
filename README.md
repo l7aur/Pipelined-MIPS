@@ -3,8 +3,6 @@ Project for the Computer Architecture course
 - The hard-coded instructions implement the generation of the Fibonacci sequence.
 - The numbers are displayed in hexadecimal.
 - The output of the computations is saved in the location 1 in the data memory (RAM/ only the last switch from left to right should be turned on).
-- Each instruction takes one clock cycle (i.e. one press of the clock button).
-- In order to get the next number in the FIbonacci sequence the clock button (center button) has to be pressed 6 times. This happens because there are 2 loads, 1 addition, 1 store and 1 jump (i.e. 6 opeartions requiring 1 clock cyle each) involved in each step of the computation of a new term.
 - There is no overflow protection.
 - From left to right the switches do:
     - 1 to 3: select between
