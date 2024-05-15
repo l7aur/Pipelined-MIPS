@@ -17,7 +17,7 @@ end register1;
 architecture Behavioral of register1 is
 
 begin
-    process(clk, reset)
+    process(clk)
         begin
         if rising_edge(clk) then
             if reset = '1' then
