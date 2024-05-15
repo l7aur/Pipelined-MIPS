@@ -31,8 +31,11 @@ component ALU is
     operand_2: in std_logic_vector(15 downto 0);
     shift_amount: in std_logic;
     ALU_control_signal: in std_logic_vector(3 downto 0);
+    branch: in std_logic;
+    branch_ongte: in std_logic;
+    andi_signal: in std_logic;
     result: out std_logic_vector(15 downto 0);
-    zero: out std_logic
+    do_branch: out std_logic
   );
 end component;
 component ALU_control is
@@ -75,6 +78,8 @@ component main_control is
     ext_op: out std_logic;
     ALU_src: out std_logic;
     branch: out std_logic;
+    branch_ongte: out std_logic;
+    andi_signal: out std_logic;
     jump: out std_logic;
     ALU_op: out std_logic;
     mem_write: out std_logic;
@@ -129,113 +134,128 @@ component extension_unit is
     data_out: out std_logic_vector(15 downto 0)
     );
 end component;
-component register_1 is
-  Port(
+component register1 is
+    Port(
     clk: in std_logic;
     reset: in std_logic;
-    slot_1_in: in std_logic_vector(15 downto 0);
-    slot_2_in: in std_logic_vector(15 downto 0);
-    slot_1_out: out std_logic_vector(15 downto 0);
-    slot_2_out: out std_logic_vector(15 downto 0)
+    adder_in: in std_logic_vector(15 downto 0);
+    instruction_in: in std_logic_vector(15 downto 0);
+    adder_out: out std_logic_vector(15 downto 0);
+    instruction_out: out std_logic_vector(15 downto 0)
   );
 end component;
-component register_2 is
+component register2 is
   Port(
     clk: in std_logic;
     reset: in std_logic;
-    slot_1_in: in std_logic_vector(15 downto 0);
-    slot_2_in: in std_logic_vector(3 downto 0);
-    slot_3_in: in std_logic_vector(2 downto 0);
-    slot_4_in: in std_logic_vector(2 downto 0);
-    extension_in: in std_logic_vector(15 downto 0);
-    register_file_1_in: in std_logic_vector(15 downto 0);
-    register_file_2_in: in std_logic_vector(15 downto 0);
     write_back_in: in std_logic_vector(1 downto 0);
-    memory_in: in std_logic_vector(1 downto 0);
+    memory_in: in std_logic_vector(3 downto 0);
     execution_in: in std_logic_vector(2 downto 0);
-    
-    slot_1_out: out std_logic_vector(15 downto 0);
-    slot_2_out: out std_logic_vector(3 downto 0);
-    slot_3_out: out std_logic_vector(2 downto 0);
-    slot_4_out: out std_logic_vector(2 downto 0);
-    extension_out: out std_logic_vector(15 downto 0);
-    register_file_1_out: out std_logic_vector(15 downto 0);
-    register_file_2_out: out std_logic_vector(15 downto 0);
+    adder_in: in std_logic_vector(15 downto 0);
+    register_file_data1_in: in std_logic_vector(15 downto 0);
+    register_file_data2_in: in std_logic_vector(15 downto 0);
+    extension_unit_in: in std_logic_vector(15 downto 0);
+    for_ALU_control_in: in std_logic_vector(3 downto 0);
+    for_mux1_in: in std_logic_vector(2 downto 0);
+    for_mux2_in: in std_logic_vector(2 downto 0);
     write_back_out: out std_logic_vector(1 downto 0);
-    memory_out: out std_logic_vector(1 downto 0);
-    execution_out: out std_logic_vector(2 downto 0)
+    memory_out: out std_logic_vector(3 downto 0);
+    execution_out: out std_logic_vector(2 downto 0);
+    adder_out: out std_logic_vector(15 downto 0);
+    register_file_data1_out: out std_logic_vector(15 downto 0);
+    register_file_data2_out: out std_logic_vector(15 downto 0);
+    extension_unit_out: out std_logic_vector(15 downto 0);
+    for_ALU_contro_out: out std_logic_vector(3 downto 0);
+    for_mux1_out: out std_logic_vector(2 downto 0);
+    for_mux2_out: out std_logic_vector(2 downto 0)
   );
 end component;
-component register_3 is
-  Port(
-  clk: in std_logic;
-  reset: in std_logic;
-  write_back_in: in std_logic_vector(1 downto 0);
-  memory_in: in std_logic_vector(1 downto 0);
-  slot_1_in: in std_logic_vector(15 downto 0);
-  slot_2_in: in std_logic_vector(15 downto 0);
-  slot_3_in: in std_logic_vector(15 downto 0);
-  slot_4_in: in std_logic_vector(2 downto 0);
-  zero_reg3_in: in std_logic;
-  
-  write_back_out: out std_logic_vector(1 downto 0);
-  memory_out: out std_logic_vector(1 downto 0);
-  slot_1_out: out std_logic_vector(15 downto 0);
-  slot_2_out: out std_logic_vector(15 downto 0);
-  slot_3_out: out std_logic_vector(15 downto 0);
-  slot_4_out: out std_logic_vector(2 downto 0);
-  zero_reg3_out: out std_logic
+component register3 is
+    Port(
+    clk: in std_logic;
+    reset: in std_logic;
+    write_back_in: in std_logic_vector(1 downto 0);
+    memory_in: in std_logic;
+    adder_in: in std_logic_vector(15 downto 0);
+    for_write_data_in: in std_logic_vector(15 downto 0);
+    mux_result_in: in std_logic_vector(2 downto 0);
+    branch_in: in std_logic;
+    ALU_in: in std_logic_vector(15 downto 0);
+    write_back_out: out std_logic_vector(1 downto 0);
+    memory_out: out std_logic;
+    adder_out: out std_logic_vector(15 downto 0);
+    for_write_data_out: out std_logic_vector(15 downto 0);
+    mux_result_out: out std_logic_vector(2 downto 0);
+    branch_out: out std_logic;
+    ALU_out: out std_logic_vector(15 downto 0)
   );
 end component;
-component register_4 is
-  Port(
-  clk: in std_logic;
-  reset: in std_logic;
-  write_back_in: in std_logic_vector(1 downto 0);
-  slot_1_in: in std_logic_vector(15 downto 0);
-  slot_2_in: in std_logic_vector(15 downto 0);
-  slot_3_in: in std_logic_vector(2 downto 0);
-  
-  write_back_out: out std_logic_vector(1 downto 0);
-  slot_1_out: out std_logic_vector(15 downto 0);
-  slot_2_out: out std_logic_vector(15 downto 0);
-  slot_3_out: out std_logic_vector(2 downto 0)
+component register4 is
+    Port(
+    clk: in std_logic;
+    reset: in std_logic;
+    write_back_in: in std_logic_vector(1 downto 0);
+    for_mux_1_in: in std_logic_vector(15 downto 0);
+    for_mux_2_in: in std_logic_vector(15 downto 0);
+    for_write_address_in: in std_logic_vector(2 downto 0);
+    write_back_out: out std_logic_vector(1 downto 0);
+    for_mux_1_out: out std_logic_vector(15 downto 0);
+    for_mux_2_out: out std_logic_vector(15 downto 0);
+    for_write_address_out: out std_logic_vector(2 downto 0)
   );
 end component;
-
 --inner signals instantiation
+
+signal auxx_3: std_logic_vector(15 downto 0);
+signal auxx_4: std_logic_vector(15 downto 0);
+signal auxx_8: std_logic_vector(15 downto 0);
+signal auxx_9: std_logic_vector(15 downto 0);
+
+signal auxxx_4: std_logic_vector(15 downto 0);
+
+signal ALU_ctrl: std_logic_vector(3 downto 0);
+signal reg1: std_logic_vector(2 downto 0);
+signal reg2: std_logic_vector(2 downto 0);
+signal extended_result: std_logic_vector(15 downto 0);
+
+signal wb1_in: std_logic_vector(0 to 1);
+signal wb1_out: std_logic_vector(0 to 1);
+signal m1_in: std_logic_vector(0 to 3);
+signal m1_out: std_logic_vector(0 to 3);
+signal ex1_in: std_logic_vector(0 to 2);
+signal ex1_out: std_logic_vector(0 to 2);
+
+signal wb2_out: std_logic_vector(0 to 1);
+signal wb3_out: std_logic_vector(0 to 1);
+signal m2_out: std_logic;
+signal auxx_6: std_logic_vector(15 downto 0);
+signal auxxx_9: std_logic_vector(15 downto 0);
+signal auxx_15: std_logic_vector(2 downto 0);
+signal auxx_12: std_logic_vector(15 downto 0);
+signal auxxx_15: std_logic_vector(2 downto 0);
+signal auxx_11: std_logic_vector(15 downto 0);
+signal auxxx_11: std_logic_vector(15 downto 0);
+signal dobranch_reg: std_logic;
 
 signal aux_1: std_logic_vector(15 downto 0);
 signal aux_2: std_logic_vector(15 downto 0);
 signal aux_3: std_logic_vector(15 downto 0);
-signal aux_3bis: std_logic_vector(15 downto 0);
-signal aux_3bisbis: std_logic_vector(15 downto 0);
 signal aux_4: std_logic_vector(15 downto 0);
-signal aux_4bis: std_logic_vector(15 downto 0);
-signal aux_4bisbis: std_logic_vector(15 downto 0);
 signal aux_5: std_logic_vector(15 downto 0);
 signal aux_6: std_logic_vector(15 downto 0);
-signal aux_6bis: std_logic_vector(15 downto 0);
 signal aux_7: std_logic;
 signal aux_8: std_logic_vector(15 downto 0);
-signal aux_8bis: std_logic_vector(15 downto 0);
 signal aux_9: std_logic_vector(15 downto 0);
-signal aux_9bis: std_logic_vector(15 downto 0);
-signal aux_9bisbis: std_logic_vector(15 downto 0);
 signal aux_10: std_logic_vector(15 downto 0);
-signal aux_10bis: std_logic_vector(15 downto 0);
 signal aux_11: std_logic_vector(15 downto 0);
-signal aux_11bis: std_logic_vector(15 downto 0);
-signal aux_11bisbis: std_logic_vector(15 downto 0);
 signal aux_12: std_logic_vector(15 downto 0);
-signal aux_12bis: std_logic_vector(15 downto 0);
 signal aux_13: std_logic_vector(15 downto 0);
 signal aux_14: std_logic_vector(3 downto 0);
 signal aux_15: std_logic_vector(2 downto 0);
-signal aux_15bis: std_logic_vector(2 downto 0);
-signal aux_15bisbis: std_logic_vector(2 downto 0);
 signal aux_16: std_logic_vector(15 downto 0);
 signal aux_17: std_logic_vector(15 downto 0);
+signal q_01: std_logic;
+signal q_02: std_logic;
 signal q_1: std_logic;
 signal q_2: std_logic;
 signal q_3: std_logic;
@@ -248,28 +268,16 @@ signal q_9: std_logic;
 signal q_10: std_logic;
 signal q_11: std_logic;
 
-signal q8q9: std_logic_vector(1 downto 0);
-signal q4q7: std_logic_vector(1 downto 0);
-signal q1q3q6: std_logic_vector(2 downto 0);
-signal zero_reg3: std_logic;
-
-signal m_out_reg2: std_logic_vector(1 downto 0);
-signal m_out_reg3: std_logic_vector(1 downto 0);
-signal wb_out_reg2: std_logic_vector(1 downto 0);
-signal wb_out_reg3: std_logic_vector(1 downto 0);
-signal wb_out_reg4: std_logic_vector(1 downto 0);
-signal ex_out_reg2: std_logic_vector(2 downto 0);
-
 begin
+    debug_signal_1: instr_out <= aux_3;
+    debug_signal_2: addr_out <= aux_11;
+    debug_signal_3: ext_out <= aux_16;
+    debug_signal_4: program_c <= aux_2;
+    
     c0: instruction_memory port map(
     address => aux_2,
     data_out => aux_3
     );
-    
-    instr_out <= aux_3bis;
-    addr_out <= aux_11;
-    ext_out <= aux_16;
-    program_c <= aux_2;
     
     c1: program_counter port map(
         clk => clk,
@@ -280,10 +288,10 @@ begin
     c2: register_file port map(
         clk => clk,
         reset => reset,
-        register_write => wb_out_reg4(1),
-        read_address_1 => aux_3bis(12 downto 10),
-        read_address_2 => aux_3bis(9 downto 7),
-        write_address => aux_15bisbis,
+        register_write => wb3_out(1),
+        read_address_1 => auxx_3(12 downto 10),
+        read_address_2 => auxx_3(9 downto 7),
+        write_address => auxxx_15,
         write_data => aux_13,
         read_data_1 => aux_8,
         read_data_2 => aux_9,
@@ -300,17 +308,19 @@ begin
         BUS_SIZE => 3
         )
                    port map(
-        field_0 => aux_3bisbis(9 downto 7),
-        field_1 => aux_3bisbis(6 downto 4),
-        selection_signal => ex_out_reg2(0),
+        field_0 => reg1,
+        field_1 => reg2,
+        selection_signal => ex1_out(2),
         output => aux_15
         ); 
         c4: main_control port map(
-        instruction => aux_3bis(15 downto 13),
+        instruction => auxx_3(15 downto 13),
         reg_dest => q_1,
         ext_op => q_2,
         ALU_src => q_3,
         branch => q_4,
+        branch_ongte => q_01,
+        andi_signal => q_02,
         jump => q_5,
         ALU_op => q_6,
         mem_write => q_7,
@@ -323,28 +333,31 @@ begin
         result => aux_4
         );
         c6: ALU port map(
-        operand_1 => aux_8bis, 
+        operand_1 => auxx_8, 
         operand_2 => aux_16,
         shift_amount => q_10,
         ALU_control_signal => aux_14,
+        branch => m1_out(1),
+        branch_ongte => m1_out(2),
+        andi_signal => m1_out(3),
         result => aux_11,
-        zero => q_11
+        do_branch => q_11
         );
         c7: mux2_1 generic map(
         BUS_SIZE => 16
         )
                    port map(
-        field_0 => aux_9bis,
-        field_1 => aux_10bis,
-        selection_signal => ex_out_reg2(1),
+        field_0 => auxx_9,
+        field_1 => extended_result,
+        selection_signal => ex1_out(1),
         output => aux_16
         );
         c8: data_memory port map(
         clk => clk,
         reset => reset,
-        memory_write => m_out_reg3(1),
-        write_data => aux_9bisbis,
-        address => aux_11bis,
+        memory_write => m2_out,
+        write_data => auxxx_9,
+        address => auxx_11,
         address_to_ssd => data_address_in,
         read_data => aux_12, 
         data_to_ssd => data_out
@@ -353,30 +366,30 @@ begin
         BUS_SIZE => 16
         )
                    port map(
-        field_0 => aux_11bisbis,
-        field_1 => aux_12bis,
-        selection_signal => wb_out_reg4(0),
+        field_0 => auxxx_11,
+        field_1 => auxx_12,
+        selection_signal => wb3_out(0),
         output => aux_13
         );
-        c10: aux_7 <= m_out_reg3(0) AND zero_reg3;
+        c10: aux_7 <= q_11;
         c11: ALU_control port map(
-        function_code => aux_3bisbis(3 downto 0),
-        ALU_op => ex_out_reg2(2),
+        function_code => ALU_ctrl,
+        ALU_op => ex1_out(0),
         shift_amount => q_10,
         control_out => aux_14
         );
         c12: adder port map(
-        operator_1 => aux_4bisbis,
-        operator_2 => aux_10bis,
-        result =>aux_6bis
+        operator_1 => auxxx_4,
+        operator_2 => extended_result,
+        result =>auxx_6
         );
         c13: mux2_1 generic map(
         BUS_SIZE => 16
         )
                    port map(
-        field_0 => aux_4bis,
-        field_1 => aux_6bis,
-        selection_signal => aux_7,
+        field_0 => aux_4,
+        field_1 => auxx_6,
+        selection_signal => dobranch_reg,
         output => aux_17
         );
         c14: mux2_1 generic map(
@@ -390,74 +403,83 @@ begin
         );
         c15: extension_unit port map(
         ext_op => q_2,
-        data_in => aux_3bis(6 downto 0),
+        data_in => auxx_3(6 downto 0),
         data_out => aux_10
         );
-        c16: aux_5 <= "000" & aux_3bis(12 downto 0);
-        p1: register_1 port map(
+        c16: aux_5 <= "000" & auxx_3(12 downto 0);
+        
+        ---------------------------------------------------
+        pipeline1: register1 port map(
         clk => clk,
         reset => reset,
-        slot_1_in =>aux_4,
-        slot_2_in =>aux_3,
-        slot_1_out => aux_4bis,
-        slot_2_out => aux_3bis
+        adder_in => aux_4,
+        instruction_in => aux_3,
+        adder_out => auxx_4,
+        instruction_out => auxx_3
         );
-        q8q9 <= q_8 & q_9;
-        q4q7 <= q_4 & q_7;
-        q1q3q6 <= q_1 & q_3 & q_6;
-        p2: register_2 port map(
+        
+        wb1_in <= q_8 & q_9;
+        m1_in <= q_7 & q_4 & q_01 & q_02;
+        ex1_in <= q_6 & q_3 & q_1;
+        
+        pipeline2: register2 port map(
         clk => clk,
         reset => reset,
-        slot_1_in => aux_4bis,
-        slot_2_in => aux_3bis(3 downto 0),
-        slot_3_in => aux_3bis(9 downto 7),
-        slot_4_in => aux_3bis(6 downto 4),
-        extension_in => aux_10,
-        register_file_1_in => aux_8,
-        register_file_2_in => aux_9,
-        write_back_in => q8q9,
-        memory_in => q4q7,
-        execution_in => q1q3q6,
-        slot_1_out => aux_4bisbis,
-        slot_2_out => aux_3bisbis(3 downto 0),
-        slot_3_out => aux_3bisbis(9 downto 7),
-        slot_4_out => aux_3bisbis(6 downto 4),
-        extension_out => aux_10bis,
-        register_file_1_out => aux_8bis,
-        register_file_2_out => aux_9bis,
-        write_back_out => wb_out_reg2,
-        memory_out => m_out_reg2,
-        execution_out => ex_out_reg2
+        write_back_in => wb1_in,
+        memory_in => m1_in,
+        execution_in => ex1_in,
+        adder_in => auxx_4,
+        register_file_data1_in => aux_8,
+        register_file_data2_in => aux_9,
+        extension_unit_in => aux_10,
+        for_ALU_control_in => auxx_3(3 downto 0),
+        for_mux1_in => auxx_3(9 downto 7),
+        for_mux2_in => auxx_3(6 downto 4),
+        write_back_out => wb1_out,
+        memory_out => m1_out,
+        execution_out => ex1_out,
+        adder_out => auxxx_4,
+        register_file_data1_out => auxx_8,
+        register_file_data2_out => auxx_9,
+        extension_unit_out => extended_result,
+        for_ALU_contro_out => ALU_ctrl,
+        for_mux1_out => reg1,
+        for_mux2_out => reg2
         );
-        p3: register_3 port map(
+        
+        pipeline3: register3 port map(
         clk => clk,
         reset => reset,
-        write_back_in => wb_out_reg2,
-        memory_in => m_out_reg2,
-        slot_1_in => aux_6,
-        slot_2_in => aux_11,
-        slot_3_in => aux_9bis,
-        slot_4_in => aux_15,
-        zero_reg3_in => q_11,
-        write_back_out => wb_out_reg3,
-        memory_out => m_out_reg3,
-        slot_1_out => aux_6bis,
-        slot_2_out => aux_11bis,
-        slot_3_out => aux_9bisbis,
-        slot_4_out => aux_15bis,
-        zero_reg3_out => zero_reg3
+       
+        write_back_in => wb1_out,
+        memory_in => m1_out(0),
+        adder_in => aux_6,
+        for_write_data_in => auxx_9,
+        mux_result_in => aux_15,
+        branch_in => q_11,
+        ALU_in => aux_11,
+        
+        write_back_out => wb2_out,
+        memory_out => m2_out,
+        adder_out => auxx_6,
+        for_write_data_out => auxxx_9,
+        mux_result_out => auxx_15,
+        branch_out => dobranch_reg,
+        ALU_out => auxx_11
         );
-        p4: register_4 port map(
+        pipeline4: register4 port map(
         clk => clk,
         reset => reset,
-        write_back_in => wb_out_reg3,
-        slot_1_in => aux_12,
-        slot_2_in => aux_11bis,
-        slot_3_in => aux_15bis,
-        write_back_out => wb_out_reg4,
-        slot_1_out => aux_12bis,
-        slot_2_out => aux_11bisbis,
-        slot_3_out => aux_15bisbis
+      
+        write_back_in => wb2_out,
+        for_mux_1_in => aux_12,
+        for_mux_2_in => auxx_11,
+        for_write_address_in => auxx_15,
+      
+        write_back_out => wb3_out,
+        for_mux_1_out => auxx_12,
+        for_mux_2_out => auxxx_11,
+        for_write_address_out => auxxx_15
         );
-    
+        
 end Behavioral;

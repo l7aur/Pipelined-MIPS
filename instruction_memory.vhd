@@ -18,7 +18,10 @@ constant memory_content: memory_array := (
     2 => B"000_001_010_011_0000",   --0530      --add register1 and register2 and save in register3
     3 => B"011_000_010_0000001",    --6101      --store contents of register2 at memory address 1
     4 => B"011_000_011_0000010",    --6182      --store contents of register3 at memory address 2
-    5 => B"111_0000000000000",      --E000      --jump to address 0 in instruction_memory (here)
+    5 => B"010_000_011_0000001",    --4181      --load register3 with contents from ram address 1
+    6 => B"100_100_011_0000001",    --9181      --branch to instruction +1 (+1) if maximum number reached
+    7 => B"111_0000000000000",      --E000      --jump to address 0 in instruction_memory (here)
+    8 => B"011_000_101_0000001",    --6281      --store contents of register5 at memory address 1
     others => x"FFFF"  
 );
 begin

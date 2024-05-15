@@ -27,6 +27,8 @@ end register_file;
 architecture Behavioral of register_file is
 type reg_array is array(0 to 7) of std_logic_vector(15 downto 0);
 signal reg_data: reg_array := (
+    4 => x"B520", --for branch
+    5 => x"EEEE", --for end of instruction
     others => x"0000"
 );
 
@@ -39,8 +41,8 @@ begin
                 reg_data(1) <= x"0000";
                 reg_data(2) <= x"0000";
                 reg_data(3) <= x"0000";
-                reg_data(4) <= x"0000";
-                reg_data(5) <= x"0000";
+                reg_data(4) <= x"B520";
+                reg_data(5) <= x"EEEE";
                 reg_data(6) <= x"0000";
                 reg_data(7) <= x"0000";
             else
