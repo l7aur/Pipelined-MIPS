@@ -32,7 +32,7 @@ begin
             else
                 write_back_out <= write_back_in;
                 for_mux_1_out <= for_mux_1_in;
-                for_mux_2_out <= for_mux_1_in;
+                for_mux_2_out <= for_mux_2_in;
                 for_write_address_out <= for_write_address_in;
             end if;
         end if;
